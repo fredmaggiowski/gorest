@@ -6,7 +6,7 @@ Using GoRest extremely simple, all you need to do is create the handler, create 
 
 ## Example
 
-```
+```go
 package main
 
 import (
@@ -60,7 +60,7 @@ You might the following features:
 
 In order to implement these features we could create the following:
 
-```
+```go
 package myresources
 
 type PostResource struct {}
