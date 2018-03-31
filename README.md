@@ -2,6 +2,13 @@
 
 GoRest is a powerful resource-oriented HTTP handler.
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/fredmaggiowski/gorest)](https://goreportcard.com/report/github.com/fredmaggiowski/gorest)&nbsp;
+[![Build Status](https://travis-ci.org/fredmaggiowski/gorest.svg?branch=master)](https://travis-ci.org/fredmaggiowski/gorest)&nbsp;
+[![GoDoc](https://godoc.org/github.com/fredmaggiowski/gorest?status.svg)](https://godoc.org/github.com/fredmaggiowski/gorest)&nbsp;
+[![codecov](https://codecov.io/gh/fredmaggiowski/gorest/branch/master/graph/badge.svg)](https://codecov.io/gh/fredmaggiowski/gorest)&nbsp;
+[![GitHub issues](https://img.shields.io/github/issues/fredmaggiowski/gorest.svg "GitHub issues")](https://github.com/fredmaggiowski/gorest)
+
+
 Using GoRest extremely simple, all you need to do is create the handler, create your resources and decide on which path you want them to be available and register your desired _Routes_.
 
 ## Example
