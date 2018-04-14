@@ -160,9 +160,9 @@ func TestGetRoutes(t *testing.T) {
 	}
 }
 
-// TestGetHandler verifies that the internal getHandler method works by
-// properly converting and retrieving the correct handler.
-func TestGetHandler(t *testing.T) {
+// TestGetHandlerFunction verifies that the internal getHandlerFunction method
+//  works by properly converting and retrieving the correct handler.
+func TestGetHandlerFunction(t *testing.T) {
 	type invalidResource struct{}
 
 	GetFunctionName := func(i interface{}) string {
@@ -171,24 +171,24 @@ func TestGetHandler(t *testing.T) {
 
 	h := NewHandler()
 	// Get
-	handler := h.getHandler(http.MethodGet, testResourceWithGet{})
+	handler := h.getHandlerFunction(http.MethodGet, testResourceWithGet{})
 	if handler == nil {
 		t.Fatalf("Unexpected nil handler.")
 	}
 	if fn := GetFunctionName(handler); !strings.ContainsAny(fn, "Get") {
 		t.Fatalf("Unexpected function name. Expected: %s - Found: %s.", "Get", fn)
 	}
-	handler = h.getHandler(http.MethodGet, invalidResource{})
+	handler = h.getHandlerFunction(http.MethodGet, invalidResource{})
 	if handler != nil {
 		t.Fatalf("Unexpected non-nil handler: %+v.", handler)
 	}
 
-	handler = h.getHandler(http.MethodGet, testResourceWithPost{})
+	handler = h.getHandlerFunction(http.MethodGet, testResourceWithPost{})
 	if handler != nil {
 		t.Fatalf("Unexpected non-nil handler: %+v.", handler)
 	}
 	// Post
-	handler = h.getHandler(http.MethodPost, testResourceWithPost{})
+	handler = h.getHandlerFunction(http.MethodPost, testResourceWithPost{})
 	if handler == nil {
 		t.Fatalf("Unexpected nil handler.")
 	}
@@ -196,7 +196,7 @@ func TestGetHandler(t *testing.T) {
 		t.Fatalf("Unexpected function name. Expected: %s - Found: %s.", "Post", fn)
 	}
 	// PUT
-	handler = h.getHandler(http.MethodPut, testResourceWithPut{})
+	handler = h.getHandlerFunction(http.MethodPut, testResourceWithPut{})
 	if handler == nil {
 		t.Fatalf("Unexpected nil handler.")
 	}
@@ -204,7 +204,7 @@ func TestGetHandler(t *testing.T) {
 		t.Fatalf("Unexpected function name. Expected: %s - Found: %s.", "Put", fn)
 	}
 	// DELETE
-	handler = h.getHandler(http.MethodDelete, testResourceWithDelete{})
+	handler = h.getHandlerFunction(http.MethodDelete, testResourceWithDelete{})
 	if handler == nil {
 		t.Fatalf("Unexpected nil handler.")
 	}
@@ -212,7 +212,7 @@ func TestGetHandler(t *testing.T) {
 		t.Fatalf("Unexpected function name. Expected: %s - Found: %s.", "Delete", fn)
 	}
 	// HEAD
-	handler = h.getHandler(http.MethodHead, testResourceWithHead{})
+	handler = h.getHandlerFunction(http.MethodHead, testResourceWithHead{})
 	if handler == nil {
 		t.Fatalf("Unexpected nil handler.")
 	}
@@ -220,7 +220,7 @@ func TestGetHandler(t *testing.T) {
 		t.Fatalf("Unexpected function name. Expected: %s - Found: %s.", "Head", fn)
 	}
 	// PATCH
-	handler = h.getHandler(http.MethodPatch, testResourceWithPatch{})
+	handler = h.getHandlerFunction(http.MethodPatch, testResourceWithPatch{})
 	if handler == nil {
 		t.Fatalf("Unexpected nil handler.")
 	}
@@ -232,7 +232,6 @@ func TestGetHandler(t *testing.T) {
 // TestGetMuxRouter verifies that a filled-in mux router is returned.
 func TestGetMuxRouter(t *testing.T) {
 	h := NewHandler()
-
 	r := mux.NewRouter()
 
 	router := h.GetMuxRouter(r)

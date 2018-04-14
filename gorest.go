@@ -47,7 +47,7 @@ func (h *RestHandler) HandleRoute(route *Route) http.HandlerFunc {
 		}
 
 		// Get handler function for specified resource for the route.
-		handler := h.getHandler(request.Method, route.GetResource())
+		handler := h.getHandlerFunction(request.Method, route.GetResource())
 		if handler == nil {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
@@ -105,9 +105,9 @@ func (h *RestHandler) HandleRoute(route *Route) http.HandlerFunc {
 	}
 }
 
-// getHandler returns the actual http handler implementation based on resource
-// type and request method.
-func (h *RestHandler) getHandler(requestMethod string, r Resource) Handler {
+// getHandlerFunction returns the actual http handler implementation based on
+// resource type and request method.
+func (h *RestHandler) getHandlerFunction(requestMethod string, r Resource) Handler {
 	// TODO: Consider logging.
 	// if h.verbose {
 	// 	h.log.VerboseLog("[%s] Request for resource: %s.\n", requestMethod, reflect.TypeOf(resource))
