@@ -2,6 +2,7 @@ package gorest
 
 import (
 	"net/http"
+	"net/http/httptest"
 	"reflect"
 	"runtime"
 	"strings"
@@ -250,5 +251,56 @@ func TestGetMuxRouter(t *testing.T) {
 	router = h.GetMuxRouter(nil)
 	if router == nil {
 		t.Fatalf("Unexpected nil router.")
+	}
+}
+
+// TestHandleRouteFormParsingFail verifies that no unexpected panic happens
+// when parsing the request form body.
+func TestHandleRouteFormParsingFail(t *testing.T) {
+	h := NewHandler()
+	route := NewRoute(testResourceWithPost{}, "/")
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	req.Body = nil // This will make the ParseForm() function fail.
+	w := httptest.NewRecorder()
+
+	handler := h.HandleRoute(route)
+	handler.ServeHTTP(w, req)
+	if w.Code != http.StatusBadRequest {
+		t.Fatalf("Unexpected status code. Expected: %d - Found. %d.", http.StatusBadRequest, w.Code)
+	}
+}
+
+// TestHandleRouteFailsForUnsupportedMethod verifies the right status code is
+// returned when an invalid method is required on a URI.
+func TestHandleRouteFailsForUnsupportedMethod(t *testing.T) {
+	h := NewHandler()
+	route := NewRoute(testResourceWithGet{}, "/")
+	req := httptest.NewRequest(http.MethodPost, "/", nil)
+	w := httptest.NewRecorder()
+
+	handler := h.HandleRoute(route)
+	handler.ServeHTTP(w, req)
+	if w.Code != http.StatusMethodNotAllowed {
+		t.Fatalf("Unexpected status code. Expected: %d - Found. %d.", http.StatusMethodNotAllowed, w.Code)
+	}
+}
+
+// TestHandleRouteVerifyFlowWithNilResponse the HandleRoute function has two
+// flows, one of which is basically a shortpath running when the Resource
+// returns a nil response; this tes validates that flow.
+func TestHandleRouteVerifyFlowWithNilResponse(t *testing.T) {
+	h := NewHandler()
+	route := NewRoute(testResourceWithGet{}, "/")
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	w := httptest.NewRecorder()
+
+	handler := h.HandleRoute(route)
+	handler.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("Unexpected status code. Expected: %d - Found. %d.", http.StatusOK, w.Code)
+	}
+
+	if w.Body.String() != "" {
+		t.Fatalf("The body should be an empty string, found: `%s` instead", w.Body.String())
 	}
 }
