@@ -41,14 +41,16 @@ func TestStandardResponseSetBody(t *testing.T) {
 // method returns it properly.
 func TestStandardResponseGetBody(t *testing.T) {
 	r := NewStandardResponse()
-	if r.GetBody() != nil {
-		t.Fatalf("Body should be nil, found: %+v.", r.GetBody())
+	data, _ := r.GetBody()
+	if data != nil {
+		t.Fatalf("Body should be nil, found: %+v.", data)
 	}
 
 	body := []byte("hey monika")
 	r.body = body
-	if string(r.GetBody()) != string(body) {
-		t.Fatalf("Unexecpted body found. Expected: %s - Found: %s.", string(body), string(r.GetBody()))
+	data, _ = r.GetBody()
+	if string(data) != string(body) {
+		t.Fatalf("Unexecpted body found. Expected: %s - Found: %s.", string(body), string(data))
 	}
 }
 

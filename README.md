@@ -32,10 +32,8 @@ func main() {
     var resource3 Resource2
 
     // Register the routes.
-    // Rember to pass the pointer of
-    // the resource and not the resurce
-    // itself, otherwise the server will
-    // not work!
+    // Remeber to pass the pointer of the resource and not the resurce itself
+    // otherwise the server will not work!
     handler.SetRoutes([]*gorest.Route{
         gorest.NewRoute(&resource1, "/resource/1"),
         gorest.NewRoute(&resource2, "/resource/2"),
