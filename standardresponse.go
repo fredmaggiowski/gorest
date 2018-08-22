@@ -40,8 +40,8 @@ func (r *StandardResponse) SetBody(bodyBytes []byte) {
 
 // GetBody will be used by gorest core to retrieve the body to be written in
 // the HTTP response writer.
-func (r *StandardResponse) GetBody() []byte {
-	return r.body
+func (r *StandardResponse) GetBody() ([]byte, error) {
+	return r.body, nil
 }
 
 // SetCookie can be used to set a custom cookie that will be set in the
