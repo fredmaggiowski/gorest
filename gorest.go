@@ -34,8 +34,8 @@ func (h *RestHandler) SetRoutes(routes []*Route) {
 	h.routes = routes
 }
 
-// HandleRoute returns the handler function for a specific handler
-func (h *RestHandler) HandleRoute(route *Route) http.HandlerFunc {
+// handleRoute returns the handler function for a specific handler
+func (h *RestHandler) handleRoute(route *Route) http.HandlerFunc {
 	return func(w http.ResponseWriter, request *http.Request) {
 		// Try to parse the request form data.
 		if request.ParseForm() != nil {
@@ -148,7 +148,7 @@ func (h *RestHandler) GetMuxRouter(router *mux.Router) *mux.Router {
 		router = mux.NewRouter().StrictSlash(true)
 	}
 	for _, route := range h.GetRoutes() {
-		router.HandleFunc(route.GetPattern(), h.HandleRoute(route))
+		router.HandleFunc(route.GetPattern(), h.handleRoute(route))
 	}
 	return router
 }

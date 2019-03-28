@@ -263,7 +263,7 @@ func TestHandleRouteFormParsingFail(t *testing.T) {
 	req.Body = nil // This will make the ParseForm() function fail.
 	w := httptest.NewRecorder()
 
-	handler := h.HandleRoute(route)
+	handler := h.handleRoute(route)
 	handler.ServeHTTP(w, req)
 	if w.Code != http.StatusBadRequest {
 		t.Fatalf("Unexpected status code. Expected: %d - Found. %d.", http.StatusBadRequest, w.Code)
@@ -278,7 +278,7 @@ func TestHandleRouteFailsForUnsupportedMethod(t *testing.T) {
 	req := httptest.NewRequest(http.MethodPost, "/", nil)
 	w := httptest.NewRecorder()
 
-	handler := h.HandleRoute(route)
+	handler := h.handleRoute(route)
 	handler.ServeHTTP(w, req)
 	if w.Code != http.StatusMethodNotAllowed {
 		t.Fatalf("Unexpected status code. Expected: %d - Found. %d.", http.StatusMethodNotAllowed, w.Code)
@@ -294,7 +294,7 @@ func TestHandleRouteVerifyFlowWithNilResponse(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
 	w := httptest.NewRecorder()
 
-	handler := h.HandleRoute(route)
+	handler := h.handleRoute(route)
 	handler.ServeHTTP(w, req)
 	if w.Code != http.StatusOK {
 		t.Fatalf("Unexpected status code. Expected: %d - Found. %d.", http.StatusOK, w.Code)
