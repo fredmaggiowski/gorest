@@ -1,6 +1,7 @@
 package gorest
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -305,6 +306,28 @@ func TestHandleRouteVerifyFlowWithNilResponse(t *testing.T) {
 	}
 }
 
+// TestHandleRouteOKWithResponseError will invoke HandleRoute function and validate
+// the processing flow when handle Response is not nil but has returned an error.
+func TestHandleRouteOKWithResponseError(t *testing.T) {
+	h := NewHandler()
+	route := NewRoute(testResourceWithGetAndResponse{
+		testResponse{
+			body:    "",
+			bodyErr: fmt.Errorf("errorbody"),
+			cookie:  nil,
+			headers: nil,
+		},
+	}, "/")
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	w := httptest.NewRecorder()
+
+	handler := h.handleRoute(route)
+	handler.ServeHTTP(w, req)
+	if w.Code != http.StatusInternalServerError {
+		t.Fatalf("Unexpected status code. Expected: %d - Found. %d.", http.StatusInternalServerError, w.Code)
+	}
+}
+
 // TestHandleRouteOKWithResponse will invoke HandleRoute function and validate
 // the processing flow when handle Response is not nil.
 func TestHandleRouteOKWithResponse(t *testing.T) {
@@ -312,7 +335,7 @@ func TestHandleRouteOKWithResponse(t *testing.T) {
 	route := NewRoute(testResourceWithGetAndResponse{
 		testResponse{
 			body:    "testbody",
-			err:     nil,
+			bodyErr: nil,
 			cookie:  nil,
 			headers: nil,
 		},
@@ -329,5 +352,104 @@ func TestHandleRouteOKWithResponse(t *testing.T) {
 	if w.Body.String() != "testbody" {
 		t.Fatalf("Unexpected body. Expected: %s - Found: %s.", "testbody", w.Body.String())
 	}
+}
 
+// TestHandlerRouteOKWithCachableResponse validates the If-None-Match header
+// usage by returning StatusNotModified when Etag is present and is unchanged.
+func TestHandlerRouteOKWithCachableResponse(t *testing.T) {
+	h := NewHandler()
+	route := NewRoute(testResourceWithGetAndResponse{
+		testResponse{
+			body:    "testbody",
+			bodyErr: nil,
+			cookie:  nil,
+			headers: nil,
+		},
+	}, "/")
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.Header.Set("If-None-Match", getETag([]byte("testbody")))
+	w := httptest.NewRecorder()
+
+	handler := h.handleRoute(route)
+	handler.ServeHTTP(w, req)
+	if w.Code != http.StatusNotModified {
+		t.Fatalf("Unexpected status code. Expected: %d - Found. %d.", http.StatusNotModified, w.Code)
+	}
+
+	if w.Body.String() != "" {
+		t.Fatalf("Unexpected body. Expected: '' - Found: %s.", w.Body.String())
+	}
+}
+
+// TestHandleRouteOKWithResponseAndCookie will invoke HandleRoute function and validates
+// that Response cookies are properly set.
+func TestHandleRouteOKWithResponseAndCookie(t *testing.T) {
+	h := NewHandler()
+	route := NewRoute(testResourceWithGetAndResponse{
+		testResponse{
+			body:    "testbody",
+			bodyErr: nil,
+			cookie:  &http.Cookie{Domain: "monster.cookie.net", Name: "CookieMonster"},
+			headers: nil,
+		},
+	}, "/")
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	w := httptest.NewRecorder()
+
+	handler := h.handleRoute(route)
+	handler.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("Unexpected status code. Expected: %d - Found. %d.", http.StatusOK, w.Code)
+	}
+
+	if w.Body.String() != "testbody" {
+		t.Fatalf("Unexpected body. Expected: %s - Found: %s.", "testbody", w.Body.String())
+	}
+	cookies := w.Result().Cookies()
+	if len(cookies) != 1 {
+		t.Fatalf("Unexpected number of cookies. Expected: %d - Found: %d.", 1, len(cookies))
+	}
+
+	if cookies[0].Domain != "monster.cookie.net" {
+		t.Fatalf("Unexpected cookie domain. Expected: %s - Found: %s.", "monster.cookie.net", cookies[0].Domain)
+	}
+	if cookies[0].Name != "CookieMonster" {
+		t.Fatalf("Unexpected cookie name. Expected: %s - Found: %s.", "CookieMonster", cookies[0].Name)
+	}
+}
+
+// TestHandleRouteOKWithResponseAndHeaders will invoke HandleRoute function and validates
+// that Response headers are properly set.
+func TestHandleRouteOKWithResponseAndHeaders(t *testing.T) {
+	h := NewHandler()
+	route := NewRoute(testResourceWithGetAndResponse{
+		testResponse{
+			body:    "testbody",
+			bodyErr: nil,
+			cookie:  nil,
+			headers: map[string][]string{
+				"Test-Header": []string{"my-value"},
+			},
+		},
+	}, "/")
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	w := httptest.NewRecorder()
+
+	handler := h.handleRoute(route)
+	handler.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("Unexpected status code. Expected: %d - Found. %d.", http.StatusOK, w.Code)
+	}
+
+	if w.Body.String() != "testbody" {
+		t.Fatalf("Unexpected body. Expected: %s - Found: %s.", "testbody", w.Body.String())
+	}
+
+	headers := w.Result().Header
+	if len(headers["Test-Header"]) != 1 {
+		t.Fatalf("Unexpected Test-Header value. Expected slice with length 1. Found: %d.", len(headers["Test-Header"]))
+	}
+	if (headers["Test-Header"])[0] != "my-value" {
+		t.Fatalf("Unexpected Test-Header value. Expected: %s - Found: %s.", "my-value", headers["Test-Header"][0])
+	}
 }
