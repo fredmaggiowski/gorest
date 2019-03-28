@@ -17,6 +17,8 @@ Using GoRest extremely simple, all you need to do is create the handler, create 
 package main
 
 import (
+    "net/http"
+
     "github.com/fredmaggiowski/gorest"
 )
 
@@ -30,10 +32,12 @@ func main() {
     var resource3 Resource2
 
     // Register the routes.
+    // Remeber to pass the pointer of the resource and not the resource itself
+    // otherwise the server will not work!
     handler.SetRoutes([]*gorest.Route{
-        gorest.NewRoute(resource1, "/resource/1"),
-        gorest.NewRoute(resource2, "/resource/2"),
-        gorest.NewRoute(resource3, "/resource/3"),
+        gorest.NewRoute(&resource1, "/resource/1"),
+        gorest.NewRoute(&resource2, "/resource/2"),
+        gorest.NewRoute(&resource3, "/resource/3"),
     })
 
     // Get the handler for your HTTP(S) server.
@@ -70,6 +74,11 @@ In order to implement these features we could create the following:
 ```go
 package myresources
 
+import(
+    "net/http"
+    "github.com/fredmaggiowski/gorest"
+)
+
 type PostResource struct {}
 
 func (p *PostResource) Get(r *http.Request) (int, gorest.Response) {
@@ -82,7 +91,7 @@ func (p *PostResource) Get(r *http.Request) (int, gorest.Response) {
     }
 
     // Insert the post in a Response object
-    response := NewResponse()
+    response := gorest.NewStandardResponse()
     response.SetBody(post)
 
     return http.StatusOK, response

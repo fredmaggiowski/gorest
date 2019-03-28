@@ -63,10 +63,11 @@ func (h *RestHandler) handleRoute(route *Route) http.HandlerFunc {
 		if code != http.StatusOK && code != http.StatusPermanentRedirect && code != http.StatusTemporaryRedirect {
 		}
 
-		responseBody := []byte{}
+		var responseBody []byte
+		var err error
 		if response != nil {
 			// Retrieve the body to be transmitted
-			responseBody, err := response.GetBody()
+			responseBody, err = response.GetBody()
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				return
@@ -75,6 +76,7 @@ func (h *RestHandler) handleRoute(route *Route) http.HandlerFunc {
 			// cache successful GET request via ETAG
 			// with forced revalidation on each request.
 			if request.Method == http.MethodGet && code == http.StatusOK {
+
 				// Generate new ETAG, force cache revalidation and set the etag.
 				etagBytes := sha256.Sum256(responseBody)
 				etag := base64.StdEncoding.EncodeToString(etagBytes[:])
