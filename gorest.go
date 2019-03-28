@@ -69,6 +69,7 @@ func (h *RestHandler) handleRoute(route *Route) http.HandlerFunc {
 			// Retrieve the body to be transmitted
 			responseBody, err = response.GetBody()
 			if err != nil {
+				// TODO: Consider logging or returning the error.
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
@@ -76,10 +77,8 @@ func (h *RestHandler) handleRoute(route *Route) http.HandlerFunc {
 			// cache successful GET request via ETAG
 			// with forced revalidation on each request.
 			if request.Method == http.MethodGet && code == http.StatusOK {
-
 				// Generate new ETAG, force cache revalidation and set the etag.
-				etagBytes := sha256.Sum256(responseBody)
-				etag := base64.StdEncoding.EncodeToString(etagBytes[:])
+				etag := getETag(responseBody)
 				w.Header().Set("Cache-Control", "private, max-age=0, must-revalidate")
 				w.Header().Set("ETag", etag)
 
@@ -155,4 +154,9 @@ func (h *RestHandler) GetMuxRouter(router *mux.Router) *mux.Router {
 		router.HandleFunc(route.GetPattern(), h.handleRoute(route))
 	}
 	return router
+}
+
+func getETag(body []byte) string {
+	etagBytes := sha256.Sum256(body)
+	return base64.StdEncoding.EncodeToString(etagBytes[:])
 }
