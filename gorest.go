@@ -34,12 +34,9 @@ func (h *RestHandler) SetRoutes(routes []*Route) {
 	h.routes = routes
 }
 
-// HandleRoute returns the handler function for a specific h
+// HandleRoute returns the handler function for a specific handler
 func (h *RestHandler) HandleRoute(route *Route) http.HandlerFunc {
 	return func(w http.ResponseWriter, request *http.Request) {
-		// Allow CORS on all APIs.
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-
 		// Try to parse the request form data.
 		if request.ParseForm() != nil {
 			w.WriteHeader(http.StatusBadRequest)
