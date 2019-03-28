@@ -15,7 +15,13 @@ type RestHandler struct {
 }
 
 // NewHandler creates a new Handler instance.
+// Deprecated: use New() instead.
 func NewHandler() *RestHandler {
+	return New()
+}
+
+// New creates a new RestHandler instance.
+func New() *RestHandler {
 	return &RestHandler{}
 }
 
@@ -53,7 +59,7 @@ func (h *RestHandler) handleRoute(route *Route) http.HandlerFunc {
 		// Invoke the proper handler and retrieve the response and status code.
 		code, response := handler(request)
 
-		// TODO: Log a warning for invalid requests (40X - 50X)
+		// TODO: consider logging a warning for invalid requests (40X - 50X)
 		if code != http.StatusOK && code != http.StatusPermanentRedirect && code != http.StatusTemporaryRedirect {
 		}
 
@@ -106,10 +112,6 @@ func (h *RestHandler) handleRoute(route *Route) http.HandlerFunc {
 // resource type and request method.
 func (h *RestHandler) getHandlerFunction(requestMethod string, r Resource) Handler {
 	// TODO: Consider logging.
-	// if h.verbose {
-	// 	h.log.VerboseLog("[%s] Request for resource: %s.\n", requestMethod, reflect.TypeOf(resource))
-	// }
-
 	var handler Handler
 	switch requestMethod {
 	case http.MethodGet:

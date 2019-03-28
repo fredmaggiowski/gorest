@@ -304,3 +304,30 @@ func TestHandleRouteVerifyFlowWithNilResponse(t *testing.T) {
 		t.Fatalf("The body should be an empty string, found: `%s` instead", w.Body.String())
 	}
 }
+
+// TestHandleRouteOKWithResponse will invoke HandleRoute function and validate
+// the processing flow when handle Response is not nil.
+func TestHandleRouteOKWithResponse(t *testing.T) {
+	h := NewHandler()
+	route := NewRoute(testResourceWithGetAndResponse{
+		testResponse{
+			body:    "testbody",
+			err:     nil,
+			cookie:  nil,
+			headers: nil,
+		},
+	}, "/")
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	w := httptest.NewRecorder()
+
+	handler := h.handleRoute(route)
+	handler.ServeHTTP(w, req)
+	if w.Code != http.StatusOK {
+		t.Fatalf("Unexpected status code. Expected: %d - Found. %d.", http.StatusOK, w.Code)
+	}
+
+	if w.Body.String() != "testbody" {
+		t.Fatalf("Unexpected body. Expected: %s - Found: %s.", "testbody", w.Body.String())
+	}
+
+}
