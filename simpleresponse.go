@@ -44,11 +44,7 @@ func NewFailResponsef(format string, args ...interface{}) SimpleResponse {
 
 // GetBody returns the JSON encoding of the FailResponse.
 func (s SimpleResponse) GetBody() ([]byte, error) {
-	content, err := json.Marshal(s)
-	if err != nil {
-		return nil, err
-	}
-	return content, nil
+	return json.Marshal(s)
 }
 
 // GetCookie returns nil since no cookie is needed for this response.

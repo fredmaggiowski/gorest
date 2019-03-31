@@ -15,7 +15,13 @@ type RestHandler struct {
 }
 
 // NewHandler creates a new Handler instance.
+// Deprecated: use New() instead.
 func NewHandler() *RestHandler {
+	return New()
+}
+
+// New creates a new RestHandler instance.
+func New() *RestHandler {
 	return &RestHandler{}
 }
 
@@ -34,12 +40,9 @@ func (h *RestHandler) SetRoutes(routes []*Route) {
 	h.routes = routes
 }
 
-// HandleRoute returns the handler function for a specific h
-func (h *RestHandler) HandleRoute(route *Route) http.HandlerFunc {
+// handleRoute returns the handler function for a specific handler
+func (h *RestHandler) handleRoute(route *Route) http.HandlerFunc {
 	return func(w http.ResponseWriter, request *http.Request) {
-		// Allow CORS on all APIs.
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-
 		// Try to parse the request form data.
 		if request.ParseForm() != nil {
 			w.WriteHeader(http.StatusBadRequest)
@@ -56,7 +59,7 @@ func (h *RestHandler) HandleRoute(route *Route) http.HandlerFunc {
 		// Invoke the proper handler and retrieve the response and status code.
 		code, response := handler(request)
 
-		// TODO: Log a warning for invalid requests (40X - 50X)
+		// TODO: consider logging a warning for invalid requests (40X - 50X)
 		if code != http.StatusOK && code != http.StatusPermanentRedirect && code != http.StatusTemporaryRedirect {
 		}
 
@@ -66,6 +69,7 @@ func (h *RestHandler) HandleRoute(route *Route) http.HandlerFunc {
 			// Retrieve the body to be transmitted
 			responseBody, err = response.GetBody()
 			if err != nil {
+				// TODO: Consider logging or returning the error.
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
@@ -73,10 +77,8 @@ func (h *RestHandler) HandleRoute(route *Route) http.HandlerFunc {
 			// cache successful GET request via ETAG
 			// with forced revalidation on each request.
 			if request.Method == http.MethodGet && code == http.StatusOK {
-
 				// Generate new ETAG, force cache revalidation and set the etag.
-				etagBytes := sha256.Sum256(responseBody)
-				etag := base64.StdEncoding.EncodeToString(etagBytes[:])
+				etag := getETag(responseBody)
 				w.Header().Set("Cache-Control", "private, max-age=0, must-revalidate")
 				w.Header().Set("ETag", etag)
 
@@ -111,9 +113,6 @@ func (h *RestHandler) HandleRoute(route *Route) http.HandlerFunc {
 // resource type and request method.
 func (h *RestHandler) getHandlerFunction(requestMethod string, r Resource) Handler {
 	// TODO: Consider logging.
-	// if h.verbose {
-	// 	h.log.VerboseLog("[%s] Request for resource: %s.\n", requestMethod, reflect.TypeOf(resource))
-	// }
 	var handler Handler
 	switch requestMethod {
 	case http.MethodGet:
@@ -152,7 +151,12 @@ func (h *RestHandler) GetMuxRouter(router *mux.Router) *mux.Router {
 		router = mux.NewRouter().StrictSlash(true)
 	}
 	for _, route := range h.GetRoutes() {
-		router.HandleFunc(route.GetPattern(), h.HandleRoute(route))
+		router.HandleFunc(route.GetPattern(), h.handleRoute(route))
 	}
 	return router
+}
+
+func getETag(body []byte) string {
+	etagBytes := sha256.Sum256(body)
+	return base64.StdEncoding.EncodeToString(etagBytes[:])
 }

@@ -1,6 +1,5 @@
 package gorest
 
-// Go standard packages
 import (
 	"net/http"
 )

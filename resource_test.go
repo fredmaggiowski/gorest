@@ -238,6 +238,14 @@ func (testResourceWithGet) Get(r *http.Request) (int, Response) {
 	return 200, nil
 }
 
+type testResourceWithGetAndResponse struct {
+	response testResponse
+}
+
+func (t testResourceWithGetAndResponse) Get(r *http.Request) (int, Response) {
+	return 200, &t.response
+}
+
 type testResourceWithPost struct{}
 
 func (testResourceWithPost) Post(r *http.Request) (int, Response) {
