@@ -1,4 +1,4 @@
-# GoRest
+# What's gorest
 
 `gorest` is a resource-oriented HTTP handler that lets you create HTTP server focusing on your resources rather than handling.
 
@@ -8,8 +8,7 @@
 [![codecov](https://codecov.io/gh/fredmaggiowski/gorest/branch/master/graph/badge.svg)](https://codecov.io/gh/fredmaggiowski/gorest)&nbsp;
 [![GitHub issues](https://img.shields.io/github/issues/fredmaggiowski/gorest.svg "GitHub issues")](https://github.com/fredmaggiowski/gorest)
 
-
-Using GoRest extremely simple, all you need to do is create the handler, create your resources and decide on which path you want them to be available and register your desired _Routes_.
+All you need to do when using `gorest` is to create your resources and, once created the handler, assign them to the desired routes.
 
 ## Example
 
@@ -47,7 +46,7 @@ func main() {
 
 ## Concept
 
-The concept beneath the gorest core is to use Go structures and methods in order to provide the means to create a simple and well-structured API server.
+The concept beneath the gorest core is to use Go structures and associated-functions in order to provide the means to create a simple and well-structured API server.
 
 In order to achieve this gorest uses Go interfaces to understand whether a user-defined resource supports the request HTTP method and act accordingly.
 
