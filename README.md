@@ -1,6 +1,6 @@
 # GoRest
 
-GoRest is a powerful resource-oriented HTTP handler.
+`gorest` is a resource-oriented HTTP handler that lets you create HTTP server focusing on your resources rather than handling.
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/fredmaggiowski/gorest)](https://goreportcard.com/report/github.com/fredmaggiowski/gorest)&nbsp;
 [![Build Status](https://travis-ci.org/fredmaggiowski/gorest.svg?branch=master)](https://travis-ci.org/fredmaggiowski/gorest)&nbsp;
@@ -18,7 +18,6 @@ package main
 
 import (
     "net/http"
-
     "github.com/fredmaggiowski/gorest"
 )
 
@@ -41,7 +40,7 @@ func main() {
     })
 
     // Get the handler for your HTTP(S) server.
-    router := gorest.GetMuxRouter(nil)
+    router := handler.GetMuxRouter(nil)
     http.ListenAndServe("localhost:80", router)
 }
 ```
@@ -62,14 +61,12 @@ What makes gorest pick the right method for the right resource is another set of
 
 ### A `Resource` example
 
-Let's suppose you have to provide an API in order to interact with your blog posts.
+Suppose you have to provide an API in order to interact with your blog posts, You might want the following features to be available:
+ - `GET`: retrieves a post based on provided identifier;
+ - `POST`: creates a new post using data provided in the request body;
+ - `DELETE`: deletes a post based on provided identifier;
 
-You might the following features:
- - GET: retrieves a post based on provided identifier;
- - POST: creates a new post using data provided in the request body;
- - DELETE: deletes a post based on provided identifier;
-
-In order to implement these features we could create the following:
+In order to implement these features you can do as follows:
 
 ```go
 package myresources
@@ -121,7 +118,7 @@ TBD
 
 ## Roadmap
 
-As of now GoRest does not implement the `http.Handler` interface making it impossible to be used directly as handler in the `ListenAndServe` function.
+As of now `gorest` does not implement the `http.Handler` interface making it impossible to be used directly as handler in the `ListenAndServe` function.
 
 In order to grant the power of multiplexing requests we decided to keep a dependcy on the [gorilla/mux](https://github.com/gorilla/mux) package.
 
